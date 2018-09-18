@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sie.demo.dao.SysUserDao">
+	<!-- 开启mybatis的二级缓存 -->
+	<!--<cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"/> -->
+	<select id="findOne" resultType="com.sie.demo.entity.SysUser">
+		SELECT * FROM t_User1
+		WHERE id = #{id}
+	</select>
+
+	<select id="findAll" resultType="com.sie.demo.entity.SysUser">
+		SELECT * FROM t_User1
+	</select>
+
+
+	<insert id="save" parameterType="com.sie.demo.entity.SysUser">
+		INSERT
+		INTO t_User1(loginName,name,password,createTime,sex,email,detail)
+		VALUES (
+		#{loginName},
+		#{name},
+		#{password},
+		#{createTime},
+		#{sex},
+		#{email},
+		#{detail}
+		)
+	</insert>
+	<delete id="deleteOneById">
+		delete from t_User1
+		where id=#{id}
+	</delete>
+	<select id="findOneByName"
+		resultType="com.sie.demo.entity.SysUser">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT id, password, loginName, name, sex, createTime, email FROM
+		T_USER1) RN) WN
+		WHERE WN.loginName like #{loginName}
+	</select>
+	<select id="findBySex" resultType="com.sie.demo.entity.SysUser">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT id, loginName, name, sex, createTime, email FROM T_USER1) RN)
+		WN
+		WHERE WN.sex=#{sex}
+	</select>
+	<select id="findByDate" resultType="com.sie.demo.entity.SysUser">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT id, loginName, name, sex, createTime, email FROM T_USER1) RN)
+		WN
+		WHERE WN.createtime between to_date(#{date1},'yyyy-MM-dd') and
+		to_date(#{date2},'yyyy-MM-dd')
+	</select>
+	<select id="findByName" resultType="com.sie.demo.entity.SysUser">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT id, loginName, name, sex, createTime, email FROM T_USER1) RN)
+		WN
+		WHERE WN.name = #{name}
+	</select>
+	<select id="getUserInfoForPage" parameterType="Integer"
+		resultType="com.sie.demo.entity.SysUser">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT id, loginName, name, sex, createTime, email FROM T_USER1) RN)
+		WN
+		WHERE WN &gt;= #{offset}
+		AND WN &lt;= #{max}
+	</select>
+	<update id="modify">
+		update t_user1 t
+		set loginName = #{loginName},
+		password = #{password},
+		createTime = #{createTime},
+		sex = #{sex},
+		email = #{email},
+		detail = #{detail},
+		name = #{name}
+		where t.id = #{id}
+	</update>
+	<!-- 多条件查询用户 -->
+	<select id="selectUserListByConditionos"
+		resultType="com.sie.demo.entity.SysUser">
+		select * from(
+		select u.*,rownum rn
+		from (select * from t_user1
+		<where>
+			<if test="loginName!=null and loginName!=''">
+				loginName like #{loginName}
+			</if>
+			<if test="name!=null and name!=''">
+				and name like #{name}
+			</if>
+			<if test="sex!=null and sex!=''">
+				and sex = #{sex}
+			</if>
+			<if test="date1!=null and date1!=''">
+				<![CDATA[ and createtime >= to_date(#{date1,jdbcType=DATE},'yyyy-MM-dd')]]>
+			</if>
+			<if test="date2!=null and date2!=''">
+				<![CDATA[ and createtime <= to_date(#{date2,jdbcType=DATE},'yyyy-MM-dd')]]>
+			</if>
+		</where>
+		order by id) u )
+	</select>
+
+	<select id="selectUserListByConditionos1"
+		resultType="com.sie.demo.entity.SysUser">
+		select * from(
+		select u.*,rownum WN
+		from (select * from t_user1
+		<where>
+			<if test="loginName!=null and loginName!=''">
+				loginName like #{loginName}
+			</if>
+			<if test="name!=null and name!=''">
+				and name like #{name}
+			</if>
+			<if test="sex!=null and sex!=''">
+				and sex = #{sex}
+			</if>
+			<if test="date1!=null and date1!=''">
+				<![CDATA[ and createtime >= to_date(#{date1,jdbcType=DATE},'yyyy-MM-dd')]]>
+			</if>
+			<if test="date2!=null and date2!=''">
+				<![CDATA[ and createtime <= to_date(#{date2,jdbcType=DATE},'yyyy-MM-dd')]]>
+			</if>
+		</where>
+		order by id) u )tt where tt.WN &gt;= #{offset} and tt.WN &lt;=#{max}
+	</select>
+
+
+
+</mapper>

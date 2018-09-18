@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sie.demo.dao.MenuDao">
+	<!-- 开启mybatis的二级缓存 -->
+	<!--<cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"/> -->
+	<select id="findOne" resultType="com.sie.demo.entity.Menu">
+		SELECT * FROM menu
+		WHERE mid = #{mid}
+	</select>
+
+	<select id="findAll" resultType="com.sie.demo.entity.Menu">
+		SELECT * FROM menu
+	</select>
+
+
+	<insert id="save" parameterType="com.sie.demo.entity.Menu">
+		INSERT
+		INTO menu(menuName,lastMenu,address,signal,type,remark)
+		VALUES (
+		#{menuName},
+		#{lastMenu},
+		#{address},
+		#{signal},
+		#{type},
+		#{remark}
+		)
+	</insert>
+
+	<delete id="deleteOneById">
+		delete from menu
+		where mid=#{mid}
+	</delete>
+
+	<select id="findOneByName" resultType="com.sie.demo.entity.Menu">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT menuName, lastMenu, type, signal,address,remark FROM menu)
+		RN) WN
+		WHERE WN.menuName like #{menuName}
+	</select>
+
+
+	<select id="getMenuInfoForPage"
+		resultType="com.sie.demo.entity.Menu">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT * FROM menu) RN) WN
+		WHERE WN &gt;= #{offset}
+		AND WN &lt;= #{max}
+	</select>
+
+	<update id="Menumodify">
+		update menu t
+		set t.menuName = #{menuName},
+		t.lastMenu =#{lastMenu},
+		t.type =#{type},
+		t.address =#{address},
+		t.signal =#{signal},
+		t.remark =#{remark}
+		where t.mid = #{mid}
+	</update>
+
+	<update id="deleteLogical">
+		update menu t
+		set t.remark = '已删除',
+		where t.mid = #{mid}
+	</update>
+
+	<!-- 多条件查询用户 -->
+	<select id="selectMenuListByConditionos"
+		resultType="com.sie.demo.entity.Menu">
+		select * from(
+		select u.*,rownum rn
+		from (select * from menu
+		where menuName like #{menuName}
+		order by mid) u )uu where uu.rn &gt;=
+		#{offset} and uu.rn &lt;= #{max}
+	</select>
+
+
+
+</mapper>

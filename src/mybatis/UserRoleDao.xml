@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sie.demo.dao.UserRoleDao">
+	<!-- 开启mybatis的二级缓存 -->
+	<!--<cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"/> -->
+	<select id="findOne" resultType="com.sie.demo.entity.UserRole">
+		SELECT * FROM user_role
+		WHERE rid = #{rid}
+	</select>
+
+	<select id="findAll" resultType="com.sie.demo.entity.UserRole">
+		SELECT * FROM user_role
+	</select>
+
+
+	<insert id="save" parameterType="com.sie.demo.entity.UserRole">
+		INSERT
+		INTO user_role(id,rid)
+		VALUES (
+		#{id},
+		#{rid}
+		)
+	</insert>
+
+	<delete id="deleteOneById">
+		delete from user_role
+		where id=#{id}
+	</delete>
+
+	<select id="findOneByName" resultType="com.sie.demo.entity.Role">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT rid, role, detail FROM role) RN) WN
+		WHERE WN.role like #{role}
+	</select>
+
+
+	<select id="findRoleByUser"
+		resultType="com.sie.demo.entity.UserRole">
+		SELECT *
+		FROM user_role where id=#{id}
+	</select>
+
+	<select id="getRoleInfoForPage"
+		resultType="com.sie.demo.entity.Role">
+		SELECT *
+		FROM (SELECT ROWNUM WN, RN.*
+		FROM (SELECT rid, role, detail FROM role) RN) WN
+		WHERE WN &gt;= #{offset}
+		AND WN &lt;= #{max}
+	</select>
+
+	<update id="UserRolemodify">
+		update user_role t
+		set t.rid = #{rid},
+		where t.id = #{id}
+	</update>
+
+	<update id="deleteLogical">
+		update role t
+		set t.del = '已删除',
+		where t.rid = #{rid}
+	</update>
+
+	<!-- 多条件查询用户 -->
+	<select id="selectRoleListByConditionos"
+		resultType="com.sie.demo.entity.Role">
+		select * from(
+		select u.*,rownum rn
+		from (select * from role
+		where role like #{role}
+		order by rid) u )uu where uu.rn &gt;= #{offset} and
+		uu.rn &lt;= #{max}
+	</select>
+
+
+
+</mapper>

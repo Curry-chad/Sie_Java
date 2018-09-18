@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sie.demo.dao.MenuRoleDao">
+	<!-- 开启mybatis的二级缓存 -->
+	<!--<cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"/> -->
+	<select id="findOne" resultType="com.sie.demo.entity.MenuRole">
+		SELECT * FROM menu_role
+		WHERE rid = #{rid}
+	</select>
+
+	<select id="findAll" resultType="com.sie.demo.entity.MenuRole">
+		SELECT * FROM menu_role
+	</select>
+
+
+	<insert id="save" parameterType="com.sie.demo.entity.MenuRole">
+		INSERT
+		INTO menu_role(mid,rid)
+		VALUES (
+		#{mid},
+		#{rid}
+		)
+	</insert>
+
+	<delete id="deleteOneById">
+		delete from menu_role
+		where rid=#{rid}
+	</delete>
+
+
+
+	<select id="findMenuByRole"
+		resultType="com.sie.demo.entity.MenuRole">
+		SELECT *
+		FROM menu_role where rid=#{rid}
+	</select>
+
+
+</mapper>
